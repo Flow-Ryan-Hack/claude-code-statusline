@@ -1,0 +1,52 @@
+# shellcheck shell=bash
+# claude-code-statusline configuration
+# Copy to ~/.claude/statusline.conf and edit. Every value is optional —
+# anything you leave out keeps its default. This file is sourced by bash, so
+# the colour variables ($GREEN, $BLUE, $DIM, $R, ...) are available.
+
+# --- Context thresholds -----------------------------------------------------
+# Absolute token counts, each capped at a percentage of the model's context
+# window. Defaults are tuned for cost: under 100K is cheap, over 400K is not.
+# THRESHOLD_1=100000;  THRESHOLD_1_PCT=50
+# THRESHOLD_2=200000;  THRESHOLD_2_PCT=75
+# THRESHOLD_3=400000;  THRESHOLD_3_PCT=90
+
+# --- Bar --------------------------------------------------------------------
+# BAR_WIDTH=20
+# BAR_MAX_ABS=400000     # bar fills here, or at the window size if smaller
+# BAR_FULL="█"
+# BAR_EMPTY="░"
+
+# --- Wording ----------------------------------------------------------------
+# /compact keeps the conversation as a summary, /clear throws it away. The
+# defaults suggest /compact first and only mention /clear once it is expensive.
+# HINT_1="optimal · nothing to do"
+# HINT_2="ok · /compact on topic switch"
+# HINT_3="expensive · /compact now"
+# HINT_4="very expensive · /compact, or /clear if done"
+# ACTION_1="keep going"
+# ACTION_2="/compact on switch"
+# ACTION_3="/compact or /clear"
+
+# --- Lines ------------------------------------------------------------------
+# SHOW_THRESHOLD_LINE=1   # line 3: the threshold scale
+# SHOW_BREAKDOWN_LINE=0   # line 4: what the context is made of
+# SHOW_LIMIT_LINE=1       # line 5: rate limits and session cost
+# SHOW_CHURN=1            # append +added/-removed lines to the breakdown
+# CACHE_WARN=90           # cache hit % below this turns yellow
+# CACHE_CRIT=50           # ... and red
+# WEEK_WARN=60            # weekly usage % that turns yellow
+# WEEK_CRIT=85            # ... and red
+
+# --- Location label ---------------------------------------------------------
+# Map your own directories to names and colours. $1 is the absolute working
+# directory. The default prints the folder name, and "~" for your home dir.
+#
+# dir_label() {
+#   case "$1" in
+#     "$HOME")            printf '%s' "${RED}⚠ no project${R}" ;;
+#     "$HOME"/work/*)     printf '%s' "${BLUE}work${R}" ;;
+#     "$HOME"/personal/*) printf '%s' "${GREEN}personal${R}" ;;
+#     *)                  printf '%s' "${DIM}${1##*/}${R}" ;;
+#   esac
+# }
