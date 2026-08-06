@@ -30,7 +30,7 @@
 
 # --- Lines ------------------------------------------------------------------
 # SHOW_THRESHOLD_LINE=1   # line 3: the threshold scale
-# SHOW_BREAKDOWN_LINE=0   # line 4: what the context is made of
+# SHOW_BREAKDOWN_LINE=1   # line 4: what the context is made of
 # SHOW_LIMIT_LINE=1       # line 5: rate limits and session cost
 # SHOW_CHURN=1            # append +added/-removed lines to the breakdown
 # CACHE_WARN=90           # cache hit % below this turns yellow

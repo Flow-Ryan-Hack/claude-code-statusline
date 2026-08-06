@@ -52,24 +52,23 @@ Both are re-sending the same 185K of context on every single turn.
 | 1 | Model, reasoning effort, and where you're working |
 | 2 | Context bar, absolute tokens / window size, and what to do about it |
 | 3 | The three thresholds, coloured by where you currently stand |
-| 4 | What the context is made of — cache hit rate, and code churn (optional) |
+| 4 | What the context is made of — cache hit rate, and code churn |
 | 5 | Weekly limit, 5-hour limit, session cost |
 
 **Line 2 colours:** green under 100K, yellow under 200K, orange under 400K, red above.
 The hint is always visible so you never have to remember the bands.
 
 ![Status line in the green band. Claude Sonnet 5, a context bar reading 61K of 1.0M, and
-the hint "optimal, nothing to do". Four lines: the composition line is off in the default
-configuration.](docs/statusline-optimal.svg)
+the hint "optimal, nothing to do". The composition line shows a 96% cache hit
+rate.](docs/statusline-optimal.svg)
 
-*Green, default configuration — four lines and nothing to act on.*
+*Green, default configuration. Nothing to act on.*
 
 ![Status line in the red band. A full context bar reading 512K of 1.0M with the bold hint
 "very expensive, /compact, or /clear if done". All three thresholds are red, and the weekly
 limit reads 74% in yellow.](docs/statusline-critical.svg)
 
-*Red and bold, past the top threshold, with the optional composition line switched on. The
-weekly figure has turned yellow at 74%.*
+*Red and bold, past the top threshold. The weekly figure has turned yellow at 74%.*
 
 **Why the hints say `/compact` before `/clear`:** `/clear` starts an empty session and
 throws the conversation away, so you pay for re-explaining everything. `/compact` replaces
@@ -81,8 +80,8 @@ in the top band.
 **Line 3 colours:** a threshold you are below is dimmed green (not relevant yet), the
 band you are currently in is yellow, and thresholds you've passed are red.
 
-**Line 4** is off by default because five lines is a lot. Turn it on with
-`SHOW_BREAKDOWN_LINE=1`. `cached` is the share of input served from the prompt cache —
+**Line 4** is on by default. Turn it off with `SHOW_BREAKDOWN_LINE=0` if five lines is
+more than you want on screen. `cached` is the share of input served from the prompt cache —
 cache reads cost about a tenth of fresh input, so a falling number is the clearest early
 signal that a conversation is getting expensive. Note these figures describe the context
 window **as it stands right now**, not cumulative session totals; the status line payload
@@ -127,7 +126,7 @@ file with `CLAUDE_STATUSLINE_CONFIG`.
 Common tweaks:
 
 ```bash
-SHOW_BREAKDOWN_LINE=1       # show the context composition line
+SHOW_BREAKDOWN_LINE=0       # hide the context composition line
 SHOW_LIMIT_LINE=0           # hide rate limits and cost
 THRESHOLD_1=50000           # warn earlier
 HINT_4="stop. /compact."    # your own wording

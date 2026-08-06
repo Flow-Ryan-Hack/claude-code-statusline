@@ -215,11 +215,12 @@ STATES = {
         config={},
         args=dict(model="Claude Sonnet 5", directory="/home/dev/api-gateway",
                   tokens_in=60_376, tokens_out=624, cost=0.42,
-                  week=12.0, five_hour=8.0, week_hours=120),
+                  week=12.0, five_hour=8.0, week_hours=120,
+                  usage=(58_000, 2_000, 376), churn=(31, 8)),
     ),
-    # Past the second threshold: orange, and the breakdown line switched on.
+    # Past the second threshold: orange, and the cache hit rate still healthy.
     "statusline-expensive": dict(
-        config={"SHOW_BREAKDOWN_LINE": 1},
+        config={},
         args=dict(model="Claude Opus 5 (1M context)", directory="/home/dev/monorepo",
                   tokens_in=260_000, tokens_out=2_000, cost=10.91,
                   week=18.0, five_hour=14.0, week_hours=89,
@@ -227,7 +228,7 @@ STATES = {
     ),
     # Top band: red and bold, and the weekly figure has turned yellow too.
     "statusline-critical": dict(
-        config={"SHOW_BREAKDOWN_LINE": 1},
+        config={},
         args=dict(model="Claude Opus 5 (1M context)",
                   directory="/home/dev/claude-code-statusline",
                   tokens_in=505_000, tokens_out=7_000, cost=18.74,

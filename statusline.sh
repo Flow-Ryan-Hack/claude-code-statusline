@@ -7,7 +7,7 @@
 # Line 1  model · effort · location
 # Line 2  context bar · absolute tokens / window · what to do about it
 # Line 3  the three thresholds, coloured by where you stand
-# Line 4  what the context is made of (optional, off by default)
+# Line 4  what the context is made of (optional)
 # Line 5  weekly limit · 5h limit · session cost
 #
 # Thresholds are absolute token counts, not percentages, because cost scales
@@ -59,7 +59,7 @@ ACTION_2="/compact on switch"
 ACTION_3="/compact or /clear"
 
 SHOW_THRESHOLD_LINE=1   # line 3: threshold scale
-SHOW_BREAKDOWN_LINE=0   # line 4: what the context is made of
+SHOW_BREAKDOWN_LINE=1   # line 4: what the context is made of
 SHOW_LIMIT_LINE=1       # line 5: rate limits and session cost
 SHOW_CHURN=1            # append +added/-removed lines to the breakdown
 CACHE_WARN=90           # cache hit % below this turns yellow
