@@ -54,6 +54,7 @@ Both are re-sending the same 185K of context on every single turn.
 | 3 | The three thresholds, coloured by where you currently stand |
 | 4 | What the context is made of — cache hit rate, and code churn (optional) |
 | 5 | Weekly limit, 5-hour limit, session cost |
+| 6 | Machine load: load vs. cores, free RAM, swap, headless browsers, running sessions (macOS, optional) |
 
 **Line 2 colours:** green under 100K, yellow under 200K, orange under 400K, red above.
 The hint is always visible so you never have to remember the bands.
@@ -87,6 +88,27 @@ cache reads cost about a tenth of fresh input, so a falling number is the cleare
 signal that a conversation is getting expensive. Note these figures describe the context
 window **as it stands right now**, not cumulative session totals; the status line payload
 only reports the current window.
+
+**Line 6** answers a third question: **can the machine keep up?** Run enough sessions in
+parallel and the bottleneck stops being tokens. Each session is light on its own; what it
+launches is not. One agent rendering screenshots with eight headless Chromes in parallel
+is enough to push a 16 GB Mac deep into swap. Turn the line on with `SHOW_MACHINE_LINE=1`.
+
+```
+load 51/10 · ram free 30% · swap 12.8G · headless 16 · sessions 9
+```
+
+| Figure | Meaning | Green | Yellow | Red |
+|---|---|---|---|---|
+| `load` | Tasks waiting for a CPU (1-minute average) / cores | up to cores | up to 2× cores | above |
+| `ram free` | Memory macOS can still hand out | 40% and up | 20–40% | below 20% |
+| `swap` | Memory moved out to disk; drains slowly, so read it as history | | | |
+| `headless` | Headless browser processes, usually agents taking screenshots | 0 | 1–6 | 7 and up |
+| `sessions` | Running `claude` processes, idle ones included | up to 4 | 5 and up | |
+
+Read it left to right: a red `load` almost always traces back to `headless` or
+`sessions`. If `headless` stays up while nothing is rendering, a browser has hung and can
+be killed.
 
 ## Install
 
@@ -178,6 +200,8 @@ python3 docs/render.py
 
 - The script runs on every status line update, so it stays to `jq` plus arithmetic. Avoid
   adding `git status` or anything else that shells out per render — it's noticeable.
+- The machine line is the one exception: two `sysctl` reads and two `pgrep` calls, a few
+  milliseconds, which is why it is opt-in.
 - Rate limit and cost fields are absent early in a session; those parts simply don't render.
 - A missing or zero context window falls back to 200K rather than dividing by zero.
 

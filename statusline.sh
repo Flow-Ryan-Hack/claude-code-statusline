@@ -9,6 +9,8 @@
 # Line 3  the three thresholds, coloured by where you stand
 # Line 4  what the context is made of (optional, off by default)
 # Line 5  weekly limit · 5h limit · session cost
+# Line 6  machine load: load/cores · free RAM · swap · headless browsers ·
+#         running claude sessions (macOS, optional, off by default)
 #
 # Thresholds are absolute token counts, not percentages, because cost scales
 # with absolute tokens: 150K tokens cost the same whether the window is 200K
@@ -70,6 +72,23 @@ WEEK_CRIT=85            # ... and red
 LABEL_WEEK="week"
 LABEL_5H="5h"
 LABEL_SESSION="session"
+
+# Line 6: how hard the machine is working. Many parallel sessions are cheap on
+# their own; what they launch (headless browsers, builds, sub-agents) is not.
+# macOS only. Costs two pgrep calls per render, hence off by default.
+SHOW_MACHINE_LINE=0
+LOAD_WARN_X=1           # load above cores × this turns yellow
+LOAD_CRIT_X=2           # ... and red
+MEM_WARN=40             # free memory % below this turns yellow
+MEM_CRIT=20             # ... and red
+HEADLESS_WARN=1         # headless browser processes from here: yellow
+HEADLESS_CRIT=7         # ... and red
+SESSIONS_WARN=5         # running claude sessions from here: yellow
+LABEL_LOAD="load"
+LABEL_MEM="ram free"
+LABEL_SWAP="swap"
+LABEL_HEADLESS="headless"
+LABEL_SESSIONS="sessions"
 
 # Location label for line 1. Override in the config file to map your own
 # directories to names and colours. $1 is the absolute working directory.
@@ -216,8 +235,37 @@ if [ "$SHOW_LIMIT_LINE" -eq 1 ]; then
   fi
 fi
 
+# --- Line 6: machine load (macOS) ---
+L6=""
+if [ "$SHOW_MACHINE_LINE" -eq 1 ] && [ "$(uname)" = "Darwin" ]; then
+  CORES=$(sysctl -n hw.ncpu)
+  LOAD=$(sysctl -n vm.loadavg | awk '{printf "%d", $2}')
+  MEMFREE=$(sysctl -n kern.memorystatus_level)
+  SWAP=$(sysctl -n vm.swapusage | awk '{gsub("M","",$6); printf "%.1f", $6/1024}')
+  HEADLESS=$(pgrep -f -- '--headless' | wc -l | tr -d ' ')
+  SESSIONS=$(pgrep -x claude | wc -l | tr -d ' ')
+
+  if   [ "$LOAD" -gt $(( CORES * LOAD_CRIT_X )) ]; then LC=$RED
+  elif [ "$LOAD" -gt $(( CORES * LOAD_WARN_X )) ]; then LC=$YELLOW
+  else LC=$GREEN; fi
+  if   [ "$MEMFREE" -lt "$MEM_CRIT" ]; then MC=$RED
+  elif [ "$MEMFREE" -lt "$MEM_WARN" ]; then MC=$YELLOW
+  else MC=$GREEN; fi
+  if   [ "$HEADLESS" -ge "$HEADLESS_CRIT" ]; then HC=$RED
+  elif [ "$HEADLESS" -ge "$HEADLESS_WARN" ]; then HC=$YELLOW
+  else HC=$DIM; fi
+  if [ "$SESSIONS" -ge "$SESSIONS_WARN" ]; then SC=$YELLOW; else SC=$DIM; fi
+
+  L6="${DIM}${LABEL_LOAD}${R} ${LC}${LOAD}${R}${DIM}/${CORES}${R}"
+  L6="${L6} ${DIM}·${R} ${DIM}${LABEL_MEM}${R} ${MC}${MEMFREE}%${R}"
+  L6="${L6} ${DIM}·${R} ${DIM}${LABEL_SWAP}${R} ${SWAP}G"
+  L6="${L6} ${DIM}·${R} ${DIM}${LABEL_HEADLESS}${R} ${HC}${HEADLESS}${R}"
+  L6="${L6} ${DIM}·${R} ${DIM}${LABEL_SESSIONS}${R} ${SC}${SESSIONS}${R}"
+fi
+
 OUTPUT="$L1"$'\n'"$L2"
 [ -n "$L3" ] && OUTPUT="${OUTPUT}"$'\n'"$L3"
 [ -n "$L4" ] && OUTPUT="${OUTPUT}"$'\n'"$L4"
 [ -n "$L5" ] && OUTPUT="${OUTPUT}"$'\n'"$L5"
+[ -n "$L6" ] && OUTPUT="${OUTPUT}"$'\n'"$L6"
 printf '%s' "$OUTPUT"

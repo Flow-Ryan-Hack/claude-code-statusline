@@ -38,6 +38,17 @@
 # WEEK_WARN=60            # weekly usage % that turns yellow
 # WEEK_CRIT=85            # ... and red
 
+# --- Machine load (line 6, macOS) -------------------------------------------
+# Shows whether the Mac keeps up when many sessions run in parallel.
+# SHOW_MACHINE_LINE=1
+# LOAD_WARN_X=1           # load above cores × this turns yellow
+# LOAD_CRIT_X=2           # ... and red
+# MEM_WARN=40             # free memory % below this turns yellow
+# MEM_CRIT=20             # ... and red
+# HEADLESS_WARN=1         # headless browser processes from here: yellow
+# HEADLESS_CRIT=7         # ... and red
+# SESSIONS_WARN=5         # running claude sessions from here: yellow
+
 # --- Location label ---------------------------------------------------------
 # Map your own directories to names and colours. $1 is the absolute working
 # directory. The default prints the folder name, and "~" for your home dir.
